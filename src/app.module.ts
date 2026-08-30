@@ -9,7 +9,7 @@ import { FollowModule } from './follow/follow.module';
 @Module({
   imports: [
     MongooseModule.forRoot('mongodb://localhost:27017', {
-      dbName: 'MobileApp',
+      dbName: 'socialCircleDB',
     }),
     AuthModule,
     PostModule,
