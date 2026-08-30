@@ -138,4 +138,19 @@ export class AuthService {
     async getAllData(){
         return await this.authModel.find();
     }
+
+    // 6. Update the Profile image...
+    async uploadImage(userId: string, imagePath: string){
+        const updateAvatar = this.authModel.findByIdAndUpdate( 
+            userId, 
+            { avatarUrl:imagePath },
+            { returnDocument: 'after' }
+        ).exec();
+
+        if(!updateAvatar){
+            throw new NotFoundException('User not found');
+        }
+
+        return updateAvatar;
+    }
 }
