@@ -61,7 +61,7 @@ export class PostService {
                 $set:       { isLiked: true }
             },
             {new: true}
-        ).exec();
+        ).lean().exec();
 
         if (!updatedDoc) {
             throw new NotFoundException(`Post with ID ${postId} not found`);
