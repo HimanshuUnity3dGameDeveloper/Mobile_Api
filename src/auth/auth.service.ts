@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 import { Auth } from './auth.model';
 import { JwtService } from '@nestjs/jwt'; // 1. Import JwtService
+import { Response, Request } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +19,11 @@ export class AuthService {
         try{
             // Check if email or username already exists
             const existingUser = await this.authModel.findOne({
-                $or: [{ email: request.email }, { username: request.username }, { phoneNumber: request.phoneNumber }]
+                $or: [
+                    { email: request.email }, 
+                    { username: request.username }, 
+                    { phoneNumber: request.phoneNumber }, 
+                    { password: request.password}]
             });
 
             if (existingUser) {
@@ -100,9 +105,10 @@ export class AuthService {
     }
 
     // 3. Get Registered User..
-    async userLogin(identity:string, password: string){
+    async userLogin(identity:string, password: string, response: Response){
         const user = await this.authModel.findOne({$or:[{email: identity}, {phoneNumber: identity}]})
 
+        if(!user.isVerified) throw new UnauthorizedException('Invalid Credentials')
         if(!user){ 
             throw new UnauthorizedException('Invalid Credentials');
         }
@@ -112,20 +118,21 @@ export class AuthService {
             throw new UnauthorizedException('Invalid credentials');
         }
 
+        delete user.password;
+        
         // 3. Create payload for JWT
         const payload = { 
-            sub: user._id, 
-            username: user.username, 
-            email: user.email 
+            ...user
         };
 
-        // 4. Sign token and omit sensitive fields from response
-        const { password: _, otpCode: __, otpExpireAt: ___, ...userData } = user.toObject();
+        const jwt = await this.jwtService.signAsync(payload);
 
-        return {
-            message: 'Login successful',
-            accessToken: await this.jwtService.signAsync(payload),
-            user: userData
+        response.cookie('jwt', jwt, {httpOnly:true, secure:true});
+        // 4. Sign token and omit sensitive fields from response
+        //const { password: _, otpCode: __, otpExpireAt: ___, ...userData } = user.toObject();
+
+        return{
+            message: 'success'
         }
     }
 
@@ -135,8 +142,23 @@ export class AuthService {
     }
 
     // 5. Fetch All user..
-    async getAllData(){
-        return await this.authModel.find();
+    async getAllData(request: Request){
+        try{
+            const req = request.cookies['jwt'];
+
+            const data = await this.jwtService.verifyAsync(req);
+
+            if(!data){
+                throw new UnauthorizedException();
+            }
+
+            const profile = await this.authModel.findOne({id: data['user._id']})
+
+            return profile;
+
+        }catch(err){
+            throw new UnauthorizedException();
+        }        
     }
 
     // 6. Update the Profile image...

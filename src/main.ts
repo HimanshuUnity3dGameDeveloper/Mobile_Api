@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -14,6 +15,8 @@ async function bootstrap() {
   
   // 2. Bind the app to host '0.0.0.0' to accept network connections
   const port = process.env.PORT || 3000;
+
+  app.use(cookieParser('your_secret_key'));
   await app.listen(port, '0.0.0.0');
 }
 bootstrap();
