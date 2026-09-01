@@ -22,6 +22,11 @@ export class AuthController {
         return await this.authServe.userLogin(body.identity, body.password, res);
     }
 
+    @Post('logout')
+    async userLogout(@Res({ passthrough: true }) res:Response){
+        return await this.authServe.logOut(res);
+    }
+    
     @HttpCode(HttpStatus.OK)
     @Post('verify-otp')
     async verifyTheOtp(@Body() body: { userId: string; otpCode: string }) {
@@ -33,10 +38,6 @@ export class AuthController {
         return await this.authServe.getAllData(request);
     }
     
-    @Get(':id')
-    async getUserById(@Param('id') id:string){
-        return await this.authServe.getRegisteredId(id);
-    }
     
     @Post(':id/avatar')
     @UseInterceptors(FileInterceptor('avatar', {

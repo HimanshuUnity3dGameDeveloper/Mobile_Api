@@ -106,12 +106,13 @@ export class AuthService {
 
     // 3. Get Registered User..
     async userLogin(identity:string, password: string, response: Response){
-        const user = await this.authModel.findOne({$or:[{email: identity}, {phoneNumber: identity}]})
+        const user = await this.authModel.findOne({$or:[{email: identity}, {phoneNumber: identity}]});
 
-        if(!user.isVerified) throw new UnauthorizedException('Invalid Credentials')
         if(!user){ 
             throw new UnauthorizedException('Invalid Credentials');
         }
+        
+        if(!user.isVerified) throw new UnauthorizedException('Invalid Credentials');
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
@@ -119,7 +120,7 @@ export class AuthService {
         }
 
         delete user.password;
-        
+
         // 3. Create payload for JWT
         const payload = { 
             ...user
@@ -127,7 +128,7 @@ export class AuthService {
 
         const jwt = await this.jwtService.signAsync(payload);
 
-        response.cookie('jwt', jwt, {httpOnly:true, secure:true});
+        response.cookie('jwt', jwt, {httpOnly:true});
         // 4. Sign token and omit sensitive fields from response
         //const { password: _, otpCode: __, otpExpireAt: ___, ...userData } = user.toObject();
 
@@ -136,12 +137,16 @@ export class AuthService {
         }
     }
 
-    // 4. Fetch the user by id..
-    async getRegisteredId(userId: string){
-        return await this.authModel.findById(userId);
-    }
+    // 4. LogOut request..
+    async logOut(response: Response){
+        response.clearCookie('jwt', {httpOnly: true});
 
-    // 5. Fetch All user..
+        return{
+            message: 'Logout successfully'
+        }
+    }
+    
+    // 5. Fetch user..
     async getAllData(request: Request){
         try{
             const req = request.cookies['jwt'];
@@ -154,7 +159,10 @@ export class AuthService {
 
             const profile = await this.authModel.findOne({id: data['user._id']})
 
-            return profile;
+            //4. Sign token and omit sensitive fields from response
+            const { password, otpCode, otpExpireAt, isVerified, ...userData } = profile.toObject();
+
+            return userData;
 
         }catch(err){
             throw new UnauthorizedException();
