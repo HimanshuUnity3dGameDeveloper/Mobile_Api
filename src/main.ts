@@ -6,7 +6,13 @@ import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  app.enableCors(); // Enable CORS for all routes
+  
+  app.enableCors({
+    origin: 'http://localhost:4200', // Explicit frontend origin (DO NOT use '*')
+    credentials: true,               // Allow sending/receiving HTTP cookies
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
   
   // Enable static asset serving for uploaded avatars
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {

@@ -140,12 +140,11 @@ export class AuthService {
     // 4. LogOut request..
     async logOut(response: Response){
         response.clearCookie('JSON_WT', {
-            httpOnly: true, 
-            secure:process.env.NODE_ENV === 'production',
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
-            path: '/'
+            path: '/',
         });
-        
         return{
             message: 'Logout successfully'
         }
@@ -181,7 +180,7 @@ export class AuthService {
             }
 
             const {password: _, otpCode: __, otpExpireAt: ___, ...userData } = user.toObject();
-            
+
             return userData;
         } catch (err) {
             if (err instanceof ForbiddenException || err instanceof NotFoundException) {

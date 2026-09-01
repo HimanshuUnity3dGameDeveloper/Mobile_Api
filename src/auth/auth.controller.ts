@@ -22,6 +22,7 @@ export class AuthController {
         return await this.authServe.userLogin(body.identity, body.password, res);
     }
 
+    @HttpCode(HttpStatus.OK)
     @Post('logout')
     async userLogout(@Res({ passthrough: true }) res:Response){
         return await this.authServe.logOut(res);
