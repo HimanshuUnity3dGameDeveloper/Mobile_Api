@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Req, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -18,7 +18,7 @@ export class AuthController {
     }
 
     @Post('login')
-    async fetchUser(@Body() body:{identity: string, password:string}, @Res({ passthrough: true }) res:Response){
+    async fetchUser(@Body() body:{identity: string, password:string,}, @Res({ passthrough: true }) res:Response){
         return await this.authServe.userLogin(body.identity, body.password, res);
     }
 
@@ -33,11 +33,15 @@ export class AuthController {
         return await this.authServe.verifyOtp(body);
     }
 
-    @Get('user')
-    async getAllUser(@Req() request: Request){
-        return await this.authServe.getAllData(request);
+     @Get(':id')
+    async getUserById(@Param('id') id:string, @Req() request: Request){
+        return await this.authServe.getRegisteredId(id, request);
     }
-    
+
+    @Get()
+    async getAllUser(){
+        return await this.authServe.getAllData();
+    }    
     
     @Post(':id/avatar')
     @UseInterceptors(FileInterceptor('avatar', {
