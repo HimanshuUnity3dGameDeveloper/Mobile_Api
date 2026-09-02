@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Post } from './post.model';
@@ -34,10 +34,25 @@ export class PostService {
         }
     }
 
-    async getPostsByUserId(userId: string, page = 1, limit = 10) {
-        const skip = (page - 1) * limit;
-        // Match against the schema field 'userId'
-        return await this.postModel.find({ 'author.userId': userId }).sort({createdAt: -1}).skip(skip).limit(limit).exec();
+    async getPostsByUserId(request: any, page = 1, limit = 10) {
+
+        const userId = request?.userId || request?.sub;
+
+        if (!userId) {
+            throw new ForbiddenException('User identity missing in request payload');
+        }
+
+        try{
+            const skip = (page - 1) * limit;
+            // Match against the schema field 'userId'
+            return await this.postModel.find({ 'author.userId': userId }).sort({createdAt: -1}).skip(skip).limit(limit).exec();
+
+        }catch(error){
+            if (error instanceof NotFoundException || error instanceof ForbiddenException) {
+                throw error;
+            }
+            throw new NotFoundException('Invalid User ID format');
+        }
     }
 
     async getAllPost(page = 1, limit = 10){

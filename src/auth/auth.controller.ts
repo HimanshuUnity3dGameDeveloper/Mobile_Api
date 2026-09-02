@@ -1,9 +1,10 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Req, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, UseGuards, Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Req, Res, UploadedFile, UseInterceptors, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { Response, Request } from 'express';
+import { Response } from 'express';
+import { JwtAuthGuard } from 'src/jwt-auth/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -34,9 +35,10 @@ export class AuthController {
         return await this.authServe.verifyOtp(body);
     }
 
-     @Get(':id')
-    async getUserById(@Param('id') id:string, @Req() request: Request){
-        return await this.authServe.getRegisteredId(id, request);
+    @UseGuards(JwtAuthGuard)
+    @Get('user')
+    async getUserById(@Request() request: any){
+        return await this.authServe.getRegisteredId(request.user);
     }
 
     @Get()

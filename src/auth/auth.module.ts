@@ -4,6 +4,8 @@ import { AuthService } from './auth.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthSchema } from './auth.model';
 import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from 'src/jwt-auth/jwt.strategy';
+import { JwtAuthGuard } from 'src/jwt-auth/jwt-auth.guard';
 
 @Module({
   imports:[
@@ -16,6 +18,10 @@ import { JwtModule } from '@nestjs/jwt';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService]
+  providers: [
+    AuthService, 
+    JwtStrategy,     // 👈 Register Strategy as a provider
+    JwtAuthGuard,    // 👈 Register Guard as a provider (optional if imported directly)
+    ]
 })
 export class AuthModule {}

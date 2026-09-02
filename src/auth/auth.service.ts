@@ -126,7 +126,7 @@ export class AuthService {
 
         const jwt = await this.jwtService.signAsync(payload);
 
-        res.cookie('JSON_WT', jwt, {httpOnly:true})
+        res.cookie('jwt', jwt, {httpOnly:true})
         // 4. Sign token and omit sensitive fields from response
         const { password: _, otpCode: __, otpExpireAt: ___, ...userData } = user.toObject();
 
@@ -151,42 +151,32 @@ export class AuthService {
     }
     
     // 4. Fetch the user by id..
-    async getRegisteredId(userId: string, request: Request){
-        // 1. Extract token from Cookie OR Bearer Header
-        const authHeader = request.headers.authorization;
-        const token = request.cookies?.['JSON_WT'] || 
-            (authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null);
+    async getRegisteredId(request: any){
+        // 1. Extract the user identity set by JwtStrategy
+        const authUserID = request?.userId || request?.sub;
 
-        if (!token) {
-            throw new UnauthorizedException('Authentication token missing');
+        if (!authUserID) {
+            throw new ForbiddenException('User identity missing in request payload');
         }
 
+
+        // 3. Query Mongoose database safely
         try {
-            // 2. MUST use await for verifyAsync
-            const payload = await this.jwtService.verifyAsync(token);
+            const user = await this.authModel.findById(authUserID);
 
-            // 3. Extract the user ID safely from payload (handles sub, user._id, or userId)
-            const authenticatedUserId = payload.sub || payload.user?._id || payload.userId;
-
-            // 4. Validate ownership
-            if (authenticatedUserId !== userId) {
-                throw new ForbiddenException('You are not authorized to access this user data');
-            }
-
-            // 5. Query MongoDB and exclude password
-            const user = await this.authModel.findById(userId);
             if (!user) {
                 throw new NotFoundException('User not found');
             }
 
-            const {password: _, otpCode: __, otpExpireAt: ___, ...userData } = user.toObject();
-
+            // 4. Omit sensitive internal fields before sending the response
+            const { password, otpCode, otpExpireAt, ...userData } = user.toObject();
             return userData;
-        } catch (err) {
-            if (err instanceof ForbiddenException || err instanceof NotFoundException) {
-                throw err;
+
+        } catch (error) {
+            if (error instanceof NotFoundException || error instanceof ForbiddenException) {
+                throw error;
             }
-                throw new UnauthorizedException('Invalid or expired token');
+            throw new NotFoundException('Invalid User ID format');
         }
     }
 
