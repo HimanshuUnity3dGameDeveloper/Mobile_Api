@@ -151,14 +151,13 @@ export class AuthService {
     }
     
     // 4. Fetch the user by id..
-    async getRegisteredId(request: any){
+    async getRegistered(request: any){
         // 1. Extract the user identity set by JwtStrategy
         const authUserID = request?.userId || request?.sub;
 
         if (!authUserID) {
             throw new ForbiddenException('User identity missing in request payload');
         }
-
 
         // 3. Query Mongoose database safely
         try {
@@ -183,6 +182,33 @@ export class AuthService {
     // 5. Fetch All user..
     async getAllData(){
         return await this.authModel.find();
+    }
+
+    async getRegisteredUser(id: string, userRequest: any) {
+        // 1. Extract the user identity set by JwtStrategy
+        const authUserID = userRequest?.userId || userRequest?.sub;
+
+        if (!authUserID) {
+            throw new ForbiddenException('User identity missing in request payload');
+        }else{
+
+            try{
+                const user = await this.authModel.findById(id);
+                if (!user) {
+                    throw new NotFoundException('User not found');
+                }
+
+                // 4. Omit sensitive internal fields before sending the response
+                const { password, otpCode, otpExpireAt, phoneNumber, isVerified, email, __v, _id, ...userData } = user.toObject();
+                return userData;
+
+            }catch(error){
+                if (error instanceof NotFoundException || error instanceof ForbiddenException) {
+                    throw error;
+                }
+                throw new NotFoundException('Invalid User ID format');
+            }
+        }
     }
 
     // 6. Update the Profile image...

@@ -38,7 +38,7 @@ export class AuthController {
     @UseGuards(JwtAuthGuard)
     @Get('user')
     async getUserById(@Request() request: any){
-        return await this.authServe.getRegisteredId(request.user);
+        return await this.authServe.getRegistered(request.user);
     }
 
     @Get()
@@ -46,6 +46,12 @@ export class AuthController {
         return await this.authServe.getAllData();
     }    
     
+    @UseGuards(JwtAuthGuard)
+    @Get(':id')
+    async getUserByIdParam(@Param('id') id: string, @Req() request: any){
+        return await this.authServe.getRegisteredUser(id, request.user);
+    }
+
     @Post(':id/avatar')
     @UseInterceptors(FileInterceptor('avatar', {
         storage: diskStorage({
