@@ -20,6 +20,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       throw new UnauthorizedException();
     }
     // Ensures req.user contains { userId: ..., sub: ... }
-    return { userId: payload.sub || payload.userId, email: payload.email };
+    return { ...payload };
   }
 }

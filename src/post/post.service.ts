@@ -60,34 +60,36 @@ export class PostService {
         return await this.postModel.find().sort({createdAt: -1}).skip(skip).limit(limit).exec();
     }
 
-    async toggleLike(postId: string, userId?: string){
-        
-        const hasLiked = (await this.postModel.findById(postId)).likedBy.includes(userId);
-        
-        const updatedDoc = await this.postModel.findByIdAndUpdate(
-            postId, 
-            hasLiked ? {
-                $pull:      {likedBy: userId},
-                $inc:       { likesCount: -1 },
-                $set:       {isLiked: false}
-            } : {
-                $addToSet:  { likedBy: userId },
-                $inc:       { likesCount: 1 },
-                $set:       { isLiked: true }
-            },
-            {new: true}
-        ).lean().exec();
+    async toggleLike(postId: string, userRequest: any){
+        const userId = userRequest?.userId || userRequest?.sub;
 
-        if (!updatedDoc) {
-            throw new NotFoundException(`Post with ID ${postId} not found`);
+        if (!userId) {
+            throw new ForbiddenException('User identity missing in request payload');
+        }else{
+            const hasLiked = (await this.postModel.findById(postId)).likedBy.includes(userId);
+        
+            const updatedDoc = await this.postModel.findByIdAndUpdate(
+                postId, 
+                hasLiked ? {
+                    $pull:      {likedBy: userId},
+                    $inc:       { likesCount: -1 }
+                } : {
+                    $addToSet:  { likedBy: userId },
+                    $inc:       { likesCount: 1 }
+                },
+                {new: true}
+            ).lean().exec();
+
+            if (!updatedDoc) {
+                throw new NotFoundException(`Post with ID ${postId} not found`);
+            }
+
+            // Return formatted response with isLiked evaluated for this specific user
+            return {
+                ...updatedDoc,
+                // Fix count if it drops below 0 due to old edge cases
+                likesCount: Math.max(0, updatedDoc.likesCount)
+            };
         }
-
-        // Return formatted response with isLiked evaluated for this specific user
-        return {
-            ...updatedDoc,
-            isLiked: !hasLiked,
-            // Fix count if it drops below 0 due to old edge cases
-            likesCount: Math.max(0, updatedDoc.likesCount)
-        };
     }
 }
