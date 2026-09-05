@@ -14,7 +14,7 @@ import { JwtAuthGuard } from 'src/jwt-auth/jwt-auth.guard';
     JwtModule.register({
       global: true, // Makes JwtService available everywhere in your app
       secret: 'YOUR_SECRET_KEY', // Best practice: Use process.env.JWT_SECRET
-      signOptions: { expiresIn: '1m' }, // Token expiration
+      signOptions: { expiresIn: '1h' }, // Token expiration
     }),
   ],
   controllers: [AuthController],
