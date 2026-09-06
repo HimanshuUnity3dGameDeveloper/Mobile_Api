@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Req, Request, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Req, Request, UseGuards } from '@nestjs/common';
 import { PostService } from './post.service';
 import { JwtAuthGuard } from 'src/jwt-auth/jwt-auth.guard';
 
@@ -23,6 +23,11 @@ export class PostController {
     @Post()
     async uploadPost(@Body() request: string){
         return await this.postServe.createPost(request);
+    }
+
+    @Delete(':id')
+    async deletPostByID(@Param('id') id: any){
+        return await this.postServe.deletePost(id);
     }
 
     @UseGuards(JwtAuthGuard)

@@ -34,6 +34,11 @@ export class PostService {
         }
     }
 
+    // 2. Delete the Post
+    async deletePost(id: any){
+        return this.postModel.findByIdAndDelete(id);
+    }
+
     async getPostsByUserId(request: any, page = 1, limit = 10) {
 
         const userId = request?.userId || request?.sub;
