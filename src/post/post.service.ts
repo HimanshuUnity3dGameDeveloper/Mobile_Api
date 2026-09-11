@@ -39,7 +39,7 @@ export class PostService {
         return this.postModel.findByIdAndDelete(id);
     }
 
-    async getPostsByUserId(request: any, page = 1, limit = 10) {
+    async getPostsByUserId(request: any, page = 1, limit = 100) {
 
         const userId = request?.userId || request?.sub;
 
@@ -60,7 +60,7 @@ export class PostService {
         }
     }
 
-    async getAllPost(page = 1, limit = 10){
+    async getAllPost(page = 1, limit = 100){
         const skip = (page - 1) * limit;
         return await this.postModel.find({type:'POST'}).sort({createdAt: -1}).skip(skip).limit(limit).exec();
     }

@@ -78,7 +78,8 @@ export interface Reel extends mongoo.Document{
     likesCount?:    number;
     commentsCount?: number;
     repostsCount?:  number;
-    sharesCount?:   number;
+    sharesCount?:   number;    
+    isPlaying?:     boolean;
     expiresAt?:     Date | null;
     createdAt?:     Date;
     updatedAt?:     Date;
