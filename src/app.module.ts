@@ -8,6 +8,7 @@ import { FollowModule } from './follow/follow.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt-auth/jwt.strategy';
 import { JwtAuthGuard } from './jwt-auth/jwt-auth.guard';
+import { ReelModule } from './reel/reel.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { JwtAuthGuard } from './jwt-auth/jwt-auth.guard';
     AuthModule,
     PostModule,
     FollowModule,
+    ReelModule,
   ],
   controllers: [AppController],
   providers: [
