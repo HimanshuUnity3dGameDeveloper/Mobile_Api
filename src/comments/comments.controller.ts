@@ -8,21 +8,25 @@ export class CommentsController {
         private readonly commentServe: CommentsService
     ){}
 
+    // 1. Pass the Commentment here..
     @Post()
     async createComment(@Body() request: any){
         return await this.commentServe.createComment(request);
     }
 
-    @Delete(':id')
-    async deleteCommentByID(@Param('id') id: string){
-        return await this.commentServe.deleteComment(id);
-    }
-
+    // 2. Fetch the comment by feed...
     @Get(':feedId')
     async getCommentsByFeed(@Param('feedId') feedId: string) {
         return await this.commentServe.getCommentByFeed(feedId);
     }
 
+    // 3. Remove the comment...
+    @Delete(':id')
+    async deleteCommentByID(@Param('id') id: string){
+        return await this.commentServe.deleteComment(id);
+    }
+
+    //Default call..
     @Get()
     async fetchComment(){
         return await this.commentServe.getAllComment();

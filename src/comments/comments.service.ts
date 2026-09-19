@@ -27,11 +27,7 @@ export class CommentsService {
         }
     }
 
-    // 2. Delete the Comment
-    async deleteComment(id: any){
-        return this.commentModel.findByIdAndDelete(id);
-    }
-
+    // 2. Comment call by feedID..
     async getCommentByFeed(feed_Id: string){
         try{
             return await this.commentModel.find({feedId: feed_Id})
@@ -41,6 +37,12 @@ export class CommentsService {
         }
     }
 
+    // 3. Delete the Comment
+    async deleteComment(id: any){
+        return this.commentModel.findByIdAndDelete(id);
+    }
+
+    // 4. Call by default require..
     async getAllComment(){
         return await this.commentModel.find();
     }
