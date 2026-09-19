@@ -70,7 +70,7 @@ export class AuthController {
     @UseGuards(JwtAuthGuard)
     @Get('user')
     async getUser(@Request() request: any){
-        return await this.authServe.getAllUsers(request.user);
+        return await this.authServe.getSingleUsers(request.user);
     }
     
     // 6. Fetch User by Id when id is on priority base..
