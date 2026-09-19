@@ -36,4 +36,9 @@ export class PostController {
         // Call service method
         return await this.postServe.toggleLike(id, request.user);
     }
+
+    @Patch(':id/comment')
+    async commentUpdate(@Param('id') post_Id: string){
+        return await this.postServe.updateComments(post_Id);
+    }
 }

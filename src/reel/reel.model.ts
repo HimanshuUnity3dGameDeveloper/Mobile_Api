@@ -47,7 +47,7 @@ export const ReelSchema = new mongoo.Schema({
     type:           { type: String, enum:['POST', 'REEL', 'STORY'], required: true, default: 'REEL'},
     author:         { type: AuthorSchema, required: true },
     mediaUrl:       { type: String, required: true },
-    mediaType:      { type: String, required: true, enum: ['image', 'video', 'audio'], default: 'image' },
+    mediaType:      { type: String, required: true, enum: ['image', 'video'], default: 'image' },
     audio:          { type: AudioSchema, default: null },
     caption:        { type: String, default: null, maxlength: 2200 },
     time:           { type: Date, default: Date.now },
@@ -70,7 +70,7 @@ export interface Reel extends mongoo.Document{
     type:           ContentType;
     author:         Author;
     mediaUrl:       string;
-    mediaType:      'image' | 'video' | 'audio';
+    mediaType:      'image' | 'video';
     audio?:         Audio | null;
     caption?:       string | null;
     time?:          Date;

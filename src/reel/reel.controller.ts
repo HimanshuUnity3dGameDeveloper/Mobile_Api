@@ -35,4 +35,9 @@ export class ReelController {
         // Call service method
         return await this.reelServe.toggleLike(id, request.user);
     }
+
+    @Patch(':id/comment')
+    async commentUpdate(@Param('id') post_Id: string){
+        return await this.reelServe.updateComments(post_Id);
+    }
 }

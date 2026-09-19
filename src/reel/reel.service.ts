@@ -97,4 +97,14 @@ export class ReelService {
             };
         }
     }
+
+    async updateComments(post_Id: string){
+        return await this.reelModel.findByIdAndUpdate(
+            post_Id,
+            {  
+                $inc:{commentsCount: 1}
+            },
+            {new: true}
+        ).exec();
+    }
 }

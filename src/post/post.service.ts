@@ -97,4 +97,14 @@ export class PostService {
             };
         }
     }
+
+    async updateComments(post_Id: string){
+        return await this.postModel.findByIdAndUpdate(
+            post_Id,
+            {  
+                $inc:{commentsCount: 1}
+            },
+            {new: true}
+        ).exec();
+    }
 }
