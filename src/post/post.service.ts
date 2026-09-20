@@ -128,4 +128,10 @@ export class PostService {
             { $set: updatePayload }
         ).exec();
     }
+
+    // 8. Get All Story..
+    async getAllStory(page = 1, limit = 100){
+        const skip = (page - 1) * limit;
+        return await this.postModel.find({type:'STORY'}).sort({createdAt: -1}).skip(skip).limit(limit).exec();
+    }
 }

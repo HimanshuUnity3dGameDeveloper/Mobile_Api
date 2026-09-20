@@ -47,6 +47,8 @@ export class AuthService {
                 password: hashedPassword,
                 avatarUrl: request.avatarUrl,
                 bio: request.bio,
+                links: request.links,
+                gender: request.gender,
                 isVerified: false,
                 otpCode: generatedOtp,
                 otpExpireAt: otpExpiry,
