@@ -5,6 +5,7 @@ import * as bcrypt from 'bcryptjs';
 import { Auth } from './auth.model';
 import { JwtService } from '@nestjs/jwt'; // 1. Import JwtService
 import { Response, Request } from 'express';
+import { use } from 'passport';
 
 @Injectable()
 export class AuthService {
@@ -220,6 +221,26 @@ export class AuthService {
         return{
             message: 'Logout successfully'
         }
+    }
+
+    // 8. Update UserData..
+    async updateUserProfile(id:string, data: any){
+        // Validate if the ID string is a valid MongoDB ObjectId
+        if (!id) {
+            throw new BadRequestException(`Invalid Mongo User ID format: ${id}`);
+        }
+
+        const userUpdate = await this.authModel.findByIdAndUpdate(
+            id,
+            { $set: data},
+            {new: true, runValidators: true}
+        );
+
+        if(!userUpdate){
+            throw new NotFoundException('User Profile not found');
+        }
+
+        return userUpdate;
     }
 
     // Default case...

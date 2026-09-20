@@ -47,4 +47,17 @@ export class PostController {
     async commentUpdate(@Param('id') post_Id: string){
         return await this.postServe.updateComments(post_Id);
     }
+
+    // 7. Patching or updating author details...
+    @UseGuards(JwtAuthGuard)
+    @Patch('author')
+    async updatePostAuthor(@Request() request: any, @Body() updateData: any){
+        const userID = request.user?._id ||request.user?.id || request.user?.sub;
+
+        if(!userID){
+            throw new BadRequestException('User ID not found in request context.');
+        }
+
+        return await this.postServe.updateAuthor(userID, updateData);
+    }
 }

@@ -111,4 +111,21 @@ export class PostService {
             {new: true}
         ).exec();
     }
+
+    // 7. Update Post Author..
+    async updateAuthor(userID: any, updateData:  any){
+
+        if(!userID){
+            throw new BadRequestException(`Invalid Mongo User ID format: ${userID}`);
+        }
+
+        const updatePayload: Record<string, any> = {};
+        if (updateData.authorName) updatePayload['author.authorName'] = updateData.authorName;
+        if (updateData.avatarUrl) updatePayload['author.avatarUrl'] = updateData.avatarUrl;
+
+        return await this.postModel.updateMany(
+            { 'author.userId': userID }, // Fixed case sensitive key: userId
+            { $set: updatePayload }
+        ).exec();
+    }
 }
