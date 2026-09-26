@@ -247,6 +247,6 @@ export class AuthService {
 
     // Default case...
     async getAllData(){
-        return await this.authModel.find();
+        return await this.authModel.find().exec();
     }
 }
