@@ -200,7 +200,7 @@ export class AuthService {
                 }
 
                 // 4. Omit sensitive internal fields before sending the response
-                const { password, otpCode, otpExpireAt, phoneNumber, isVerified, email, __v, _id, ...userData } = user.toObject();
+                const { password, otpCode, otpExpireAt, phoneNumber, isVerified, email, __v,  ...userData } = user.toObject();
                 return userData;
 
             }catch(error){
