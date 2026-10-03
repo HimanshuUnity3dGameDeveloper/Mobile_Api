@@ -12,13 +12,14 @@ export class DirectMessageService {
 
     async createMessage(message: any){
         try{
+            // Extract user ID string for the readBy array
+            const senderUserId = message.senderId?.userId || message.senderId;
             const newMessage = new this.directMessage({
                 ...message,
-                readBy: [message.senderId],
+                readBy: senderUserId ? [senderUserId] : [],
             });
 
-            const saved =  await newMessage.save();
-            return await saved.populate('senderId', 'username fullname avatarUrl');
+            return await newMessage.save();
         }
         catch(err){
             if (err instanceof BadRequestException) {
@@ -32,7 +33,7 @@ export class DirectMessageService {
         try{
             if(!roomId) return [];
         
-            const message = await this.directMessage.find({roomId: String(roomId)}).sort({createAt: -1}).exec()
+            const message = await this.directMessage.find({roomId: String(roomId)}).exec()
             return message;
         }
         catch (error) {
@@ -44,6 +45,9 @@ export class DirectMessageService {
     async getAllRooms(){
         try{
             const rooms = await this.directMessage.aggregate([
+                {
+                    $sort: { createdAt: 1 } // Sort by createdAt in descending order
+                },
                 {
                     $group: {
                         _id: "$roomId",
@@ -65,7 +69,7 @@ export class DirectMessageService {
     async markAsRead(roomId: string, userId: string){
         const result = await this.directMessage.updateMany(
             { roomId: roomId, readBy:{$ne: userId}},
-            {$addToSet:{readBy: userId}}
+            { $addToSet:{readBy: userId}}
         );
 
         return result.modifiedCount;

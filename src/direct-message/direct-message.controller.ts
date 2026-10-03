@@ -1,5 +1,4 @@
 import { Body, Controller, Get, HttpStatus, Param, Patch, Post, Res } from '@nestjs/common';
-import { Response } from 'express';
 import { DirectMessageService } from './direct-message.service';
 
 @Controller('direct-message')
@@ -9,9 +8,9 @@ export class DirectMessageController {
         private readonly directServe: DirectMessageService
     ){}
 
-    @Post(':roomId')
-    async createGroupRoom(@Param('roomId') roomId: string){
-        return await this.directServe.createMessage(roomId);
+    @Post()
+    async createGroupRoom(@Body() request: any){
+        return await this.directServe.createMessage(request);
     }
 
     @Get('room/:roomId')

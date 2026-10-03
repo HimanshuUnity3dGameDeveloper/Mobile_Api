@@ -1,10 +1,12 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody,
-  ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
+  ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, 
+  WsException} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { UseGuards } from '@nestjs/common';
 import { WsJwtGuard } from 'src/jwt-auth/ws-jwt.guard';
 import { DirectMessageService } from './direct-message.service';
+import { Author } from './direct-message.model';
 
 interface AuthenticatedSocket extends Socket {
   user?: any;
@@ -69,11 +71,30 @@ export class DirectMessageGateway implements OnGatewayConnection, OnGatewayDisco
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('sendPrivateMessage')
   async handlePrivateMessage(
-    @MessageBody() payload: { roomID: string; senderId: string; text: string; messageType?: string },
+    @MessageBody() payload: { roomId: string; senderId: Author; text: string; messageType?: string },
   ) {
-    
-    const saveMessage = await this.directServe.createMessage(payload);
+    try{
+      // 1. Validate payload structure
+      if (!payload.roomId || !payload.senderId) {
+        throw new WsException('Missing roomID or senderId in payload');
+      }
 
-    this.server.to(payload.roomID).emit('newMessage', saveMessage);
+      // 2. Map payload keys to match DirectMessage interface/schema keys exactly
+      const messageData = {
+        roomId: payload.roomId, // Note: lowercase 'd'
+        senderId: payload.senderId,
+        text: payload.text,
+        messageType: payload.messageType || 'text',
+      };
+
+      // 3. Save to database
+      const saveMessage = await this.directServe.createMessage(messageData);
+
+      this.server.to(payload.roomId).emit('newMessage', saveMessage);
+      return saveMessage;
+    }
+    catch(err){
+      console.error('Error handling private message:', err);
+    }
   }
 }
