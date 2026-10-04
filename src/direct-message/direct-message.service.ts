@@ -67,11 +67,30 @@ export class DirectMessageService {
     }
 
     async markAsRead(roomId: string, userId: string){
-        const result = await this.directMessage.updateMany(
-            { roomId: roomId, readBy:{$ne: userId}},
-            { $addToSet:{readBy: userId}}
-        );
+        try{
+            if(!roomId || !userId) throw new BadRequestException('Room ID and User ID are required');
+            
+            const result = await this.directMessage.updateMany(
+                { roomId: roomId, readBy:{$ne: userId}},
+                { $addToSet:{readBy: userId}}
+            );
 
-        return result.modifiedCount;
+            return result.modifiedCount;
+        }
+        catch (error) {
+            console.error('Error marking messages as read:', error);
+            throw new InternalServerErrorException('Failed to mark messages as read');
+        }
+    }
+
+    async deleteRoomMessages(roomId: string){
+        try{
+            const results = await this.directMessage.deleteMany({roomId: String(roomId)});
+            return results.deletedCount;
+        }
+        catch (error) {
+            console.error('Error deleting room messages:', error);
+            throw new InternalServerErrorException('Failed to delete messages');
+        }
     }
 }
