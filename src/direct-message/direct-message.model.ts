@@ -1,16 +1,18 @@
 import * as mongo from 'mongoose';
 export const AuthorSchema = new mongo.Schema({
     userId:         { type: String, required: true, index: true },
-    authorName:     { type: String, required: true, trim: true },
+    authorFullName:     { type: String, required: true, trim: true },
+    authorUserName:     { type: String, required: true, trim: true },
     avatarUrl:      { type: String, default: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png' },
 },{   
     _id: false 
 });
 
 export interface Author{
-    userId:     string;
-    authorName: string;
-    avatarUrl:  string;
+    userId:         string;
+    authorFullName: string;
+    authorUserName: string;
+    avatarUrl:      string;
 };
 
 export const DirectMessageSchema = new mongo.Schema(
