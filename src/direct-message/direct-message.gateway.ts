@@ -87,9 +87,12 @@ export class DirectMessageGateway implements OnGatewayConnection, OnGatewayDisco
         messageType: payload.messageType || 'text',
       };
 
+      console.log("incomming data", messageData);
+
       // 3. Save to database
       const saveMessage = await this.directServe.createMessage(messageData);
 
+      // Step 4. Produce our payload to server..
       this.server.to(payload.roomId).emit('newMessage', saveMessage);
       return saveMessage;
     }

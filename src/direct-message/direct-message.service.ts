@@ -10,6 +10,7 @@ export class DirectMessageService {
         @InjectModel('DirectMessages') private directMessage: Model<DirectMessage>
     ){}
 
+    // Step 1. Creating message..
     async createMessage(message: any){
         try{
             // Extract user ID string for the readBy array
