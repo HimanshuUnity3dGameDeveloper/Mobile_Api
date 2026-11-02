@@ -14,9 +14,14 @@ import { DirectMessageModule } from './direct-message/direct-message.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017', {
+    //old database
+    MongooseModule.forRoot('mongodb://127.0.0.1:27017', {
       dbName: 'socialCircleDB',
     }),
+
+    //new db
+    // MongooseModule.forRoot('mongodb+srv://socialcircle:Pinkcity%401@moonlight.05k2ccx.mongodb.net/socialCircleDB?retryWrites=true&w=majority'),
+    
     // Configure JWT Module
     JwtModule.register({
       global: true, // Makes JwtService available everywhere in your app
