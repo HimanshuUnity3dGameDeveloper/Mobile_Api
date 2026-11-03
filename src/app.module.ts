@@ -25,7 +25,7 @@ import { DirectMessageModule } from './direct-message/direct-message.module';
     // Configure JWT Module
     JwtModule.register({
       global: true, // Makes JwtService available everywhere in your app
-      secret: 'YOUR_SECRET_KEY', // Best practice: Use process.env.JWT_SECRET
+      secret: process.env.JWT_SECRET || 'YOUR_SECRET_KEY', // Best practice: Use process.env.JWT_SECRET
       signOptions: { expiresIn: '1h' }, // Token expiration
     }),
     AuthModule,
