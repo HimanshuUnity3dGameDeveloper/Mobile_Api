@@ -16,8 +16,7 @@ import { DirectMessageModule } from './direct-message/direct-message.module';
   imports: [
     //old database
     MongooseModule.forRoot(process.env.DATABASE_URL ||
-      'mongodb://127.0.0.1:27017', {dbName: 'socialCircleDB',}
-    ),
+      'mongodb://127.0.0.1:27017', {dbName: 'socialCircleDB',}),
 
     // Configure JWT Module
     JwtModule.register({
