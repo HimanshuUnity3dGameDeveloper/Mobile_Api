@@ -11,12 +11,17 @@ import { JwtAuthGuard } from './jwt-auth/jwt-auth.guard';
 import { ReelModule } from './reel/reel.module';
 import { CommentsModule } from './comments/comments.module';
 import { DirectMessageModule } from './direct-message/direct-message.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    //old database
-    MongooseModule.forRoot(process.env.DATABASE_URL ||
-      'mongodb://127.0.0.1:27017', {dbName: 'socialCircleDB',}),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    
+    MongooseModule.forRoot(
+      process.env.DATABASE_URL || 'mongodb://127.0.0.1:27017/socialCircleDB'
+    ),
 
     // Configure JWT Module
     JwtModule.register({
